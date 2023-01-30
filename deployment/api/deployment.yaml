@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{- with .Values.event_collector_api.api }}
+
+  name: {{ .service_name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      svc: {{ .service_name }}
+  template:
+    metadata:
+      labels:
+        svc: {{ .service_name }}
+    spec:
+      containers:
+      - name: {{ .service_name }}
+        image: {{ .image }}:{{ .version }}
+        livenessProbe:
+          httpGet:
+            path: {{ .liveness }}
+            port: {{ .port }}
+            scheme: HTTP
+          initialDelaySeconds: {{ .livenessInitialDelaySeconds }}
+          timeoutSeconds: {{ .livenessTimeoutSeconds }}
+        startupProbe:
+          httpGet:
+            path: {{ .readiness }}
+            port: {{ .port }}
+            scheme: HTTP
+          initialDelaySeconds: {{ .readinessInitialDelaySeconds }}
+          timeoutSeconds: {{ .readinessTimeoutSeconds }}
+        resources:
+          requests:
+            memory: {{ .requests_memory }}
+            cpu: {{ .requests_cpu }}
+          limits:
+            memory: {{ .limits_memory }}
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: {{ .service_name }}-configmap
+        ports:
+        - containerPort: {{ .port }}
+
+  {{- end }}

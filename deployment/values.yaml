@@ -1,0 +1,34 @@
+data-collection:
+  event_collector_service:
+    db_name: "event-collector"
+    mongodb_readiness_connectivity_timeout: 2000
+    api:
+      replicas: 1
+      service_name: "event-collector-service-api"
+
+      image: "ghcr.io/Fadude/event-collector-service-api"
+      version: {{ lookup("IMAGE_VERSION") }}
+      requests_memory: "500Mi"
+      requests_cpu: "0.5"
+      limits_memory: "2000Mi"
+
+      liveness: "/live"
+      livenessInitialDelaySeconds: 15
+      livenessTimeoutSeconds: 1
+
+      readiness: "/ready"
+      readinessInitialDelaySeconds: 15
+      readinessTimeoutSeconds: 5
+
+      flask_env: "production"
+      log_level: "INFO"
+      log_format: "%(levelname)s %(asctime)s - %(message)s"
+      port: 4501
+
+      openapi_path: "event_collector_api/openapi/"
+      openapi_file_name: "openapi.yaml"
+
+      kafka_readiness_timeout: 5000
+      kafka_env: "production"
+
+      dependent_services: '{{ lookup("global.identity_service_endpoint") }}'

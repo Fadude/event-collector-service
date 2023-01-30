@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  {{- with .Values.event_collector_api.api }}
+
+  name: {{ .service_name }}-configmap
+  namespace: {{ $.Release.Namespace }}
+data:
+  OTEL_RESOURCE_ATTRIBUTES: "service.name={{ .service_name }}"
+
+  KAFKA_ENV: {{ .kafka_env }}
+  KAFKA_READINESS_TIMEOUT: {{ .kafka_readiness_timeout | quote }}
+
+  FLASK_ENV: {{ .flask_env | quote }}
+  LOG_LEVEL: {{ .log_level | quote }}
+  LOG_FORMAT: {{ .log_format | quote }}
+
+  PORT: {{ .port | quote }}
+  OPENAPI_PATH: {{ .openapi_path | quote }}
+  OPENAPI_FILE_NAME: {{ .openapi_file_name | quote }}
+
+  DB_NAME: {{ $.Values.event_collector_api.db_name | quote }}
+  MONGODB_READINESS_CONNECTIVITY_TIMEOUT: {{ $.Values.event_collector_api.mongodb_readiness_connectivity_timeout | quote }}
+
+  DEPENDENT_SERVICES: {{ .dependent_services | quote }}
+
+  {{- end }}

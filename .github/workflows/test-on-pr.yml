@@ -1,0 +1,21 @@
+
+name: Run tests on pull request
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+    branches:
+      - develop
+      - main
+
+jobs:
+  verify-jira-ticket-in-title:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Enforce jira-issue key in pull request title
+        uses: ryanvade/enforce-pr-title-style-action@v1
